@@ -5,7 +5,7 @@ use Symfony\Component\Console\Application;
 
 require __DIR__ . '/vendor/autoload.php';
 
-$application = new Application('commitstrip-downloader', '1.0.0');
+$application = new Application('commitstrip-downloader', '1.0.1');
 $commitstripCommand = new CommitstripDownloaderCommand();
 
 $application->add($commitstripCommand);

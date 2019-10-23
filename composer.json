@@ -2,13 +2,14 @@
     "name": "chindit/commitstrip-downloader",
     "description": "A simple command app to download strips from Commitstrip",
     "type": "command",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "require": {
         "php": "^7.2",
         "symfony/console": "^4.3",
         "symfony/dom-crawler": "^4.3",
         "symfony/flex": "^1.4",
-        "symfony/http-client": "^4.3"
+        "symfony/http-client": "^4.3",
+        "symfony/css-selector": "^4.3"
     },
     "require-dev": {
         "symfony/test-pack": "^1.0"
