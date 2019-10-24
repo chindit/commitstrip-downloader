@@ -116,7 +116,7 @@ class CommitstripDownloaderCommand extends Command
     		$pageRequest = $client->request('GET', $this->url . 'page/' . (string)$i);
     		$pageCrawler = new Crawler($pageRequest->getContent(false));
 
-    		/** @var \DOMElement[] $stripsOnPage */
+    		/** @var Crawler $stripsOnPage */
     		$stripsOnPage = $pageCrawler->filter('.excerpt a');
 
     		foreach ($stripsOnPage as $strip) {
@@ -136,7 +136,14 @@ class CommitstripDownloaderCommand extends Command
 
     	$pageContent = new Crawler($page->getContent(false));
 
-    	$stripLink = $pageContent->filter('.entry-content img')->attr('src');
+    	$strip = $pageContent->filter('.entry-content img');
+
+    	if ($strip->count() === 0) {
+    		$io->warning(sprintf('No strip found for %s', $pageLocation));
+    		return;
+	    }
+
+    	$stripLink = $strip->attr('src');
 
 	    if ($this->language === 'fr') {
 		    $stripLink = str_replace('/en/', '/fr/', $stripLink);
