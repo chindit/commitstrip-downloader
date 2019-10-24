@@ -814,7 +814,7 @@
         },
         {
             "name": "psr/cache",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/cache.git",

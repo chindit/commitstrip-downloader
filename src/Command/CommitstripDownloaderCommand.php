@@ -21,6 +21,7 @@ class CommitstripDownloaderCommand extends Command
 
     private $stripsCount = 0;
     private $downloaded = 0;
+    private $language = 'en';
 
     private $location = '';
 
@@ -44,10 +45,10 @@ class CommitstripDownloaderCommand extends Command
 	        0
         );
         $languageQuestion->setErrorMessage('Chosen language does not exists');
-        $language = $helper->ask($input, $output, $languageQuestion);
+        $this->language = $helper->ask($input, $output, $languageQuestion);
 
         // Add language in URL
-	    $this->url .= $language . '/';
+	    $this->url .= $this->language . '/';
 
 	    $directoryCallback = function (string $userInput): array {
 		    $inputPath = preg_replace('%(/|^)[^/]*$%', '$1', $userInput);
@@ -113,7 +114,6 @@ class CommitstripDownloaderCommand extends Command
 
     	for ($i = $lastPage; $i > 0; $i--) {
     		$pageRequest = $client->request('GET', $this->url . 'page/' . (string)$i);
-
     		$pageCrawler = new Crawler($pageRequest->getContent(false));
 
     		/** @var \DOMElement[] $stripsOnPage */
@@ -129,12 +129,18 @@ class CommitstripDownloaderCommand extends Command
     {
     	$client = HttpClient::create();
 
+    	if ($this->language === 'fr') {
+    		$pageLocation = str_replace('/en/', '/fr/', $pageLocation);
+	    }
     	$page = $client->request('GET', $pageLocation);
 
     	$pageContent = new Crawler($page->getContent(false));
 
     	$stripLink = $pageContent->filter('.entry-content img')->attr('src');
 
+	    if ($this->language === 'fr') {
+		    $stripLink = str_replace('/en/', '/fr/', $stripLink);
+	    }
     	$strip = $client->request('GET', $stripLink);
     	$stripName = $this->createStripName($pageLocation, $stripLink);
 
