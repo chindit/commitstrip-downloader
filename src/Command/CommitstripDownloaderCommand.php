@@ -33,7 +33,7 @@ class CommitstripDownloaderCommand extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
@@ -85,6 +85,8 @@ class CommitstripDownloaderCommand extends Command
 	    $this->downloadStrips($pageCount, $io);
 
         $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+
+		return Command::SUCCESS;
     }
 
     private function getLastPageLink(): string
@@ -151,6 +153,9 @@ class CommitstripDownloaderCommand extends Command
 	    if ($this->language === 'fr') {
 		    $stripLink = str_replace('/en/', '/fr/', $stripLink);
 	    }
+		if (!str_starts_with($stripLink, 'http')) {
+			$stripLink = 'https:' . $stripLink;
+		}
     	$strip = $client->request('GET', $stripLink);
     	$stripName = $this->createStripName($pageLocation, $stripLink);
 
