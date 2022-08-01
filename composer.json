@@ -2,7 +2,7 @@
     "name": "chindit/commitstrip-downloader",
     "description": "A simple command app to download strips from Commitstrip",
     "type": "command",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "require": {
         "ext-dom": "*",
         "php": "^8.0",

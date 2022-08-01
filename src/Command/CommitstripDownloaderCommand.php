@@ -17,17 +17,16 @@ class CommitstripDownloaderCommand extends Command
 {
     protected static $defaultName = 'commitstrip-downloader';
 
-    private $url = 'https://www.commitstrip.com/';
+    private string $url = 'https://www.commitstrip.com/';
 
-    private $stripsCount = 0;
-    private $downloaded = 0;
-    private $language = 'en';
+    private int $stripsCount = 0;
+    private string $language = 'en';
 
-    private $location = '';
+    private string $location = '';
 
     private const STRIPS_BY_PAGE = 20;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Download all Commitstrips comics')
@@ -112,6 +111,8 @@ class CommitstripDownloaderCommand extends Command
     {
     	$client = HttpClient::create();
 
+		$io->progressStart($this->stripsCount);
+
     	for ($i = $lastPage; $i > 0; $i--) {
     		$pageRequest = $client->request('GET', $this->url . 'page/' . (string)$i);
     		$pageCrawler = new Crawler($pageRequest->getContent(false));
@@ -121,8 +122,10 @@ class CommitstripDownloaderCommand extends Command
 
     		foreach ($stripsOnPage as $strip) {
     			$this->downloadSingleStrip($strip->getAttribute('href'), $io);
+				$io->progressAdvance();
 		    }
 	    }
+		$io->progressFinish();
     }
 
     private function downloadSingleStrip(string $pageLocation, SymfonyStyle $io): void
@@ -130,7 +133,7 @@ class CommitstripDownloaderCommand extends Command
     	$client = HttpClient::create();
 
     	if ($this->language === 'fr') {
-    		$pageLocation = str_replace('/en/', '/fr/', $pageLocation);
+    		$pageLocation = str_replace('.com/', '.com/fr/', $pageLocation);// . '?setLocale=1';
 	    }
     	$page = $client->request('GET', $pageLocation);
 
@@ -152,9 +155,6 @@ class CommitstripDownloaderCommand extends Command
     	$stripName = $this->createStripName($pageLocation, $stripLink);
 
     	file_put_contents($stripName, $strip->getContent(false));
-    	$this->downloaded++;
-
-    	$io->writeln(sprintf('(%d/%d) %s', $this->downloaded, $this->stripsCount, $stripName));
     }
 
     private function createStripName(string $url, string $filename): string
@@ -164,6 +164,6 @@ class CommitstripDownloaderCommand extends Command
 
     	$cleanedPath = $this->location . str_replace('/', '_', $path);
 
-    	return (substr($cleanedPath, -1) === '_' ? substr($cleanedPath, 0, strlen($cleanedPath) - 1) : $cleanedPath) . '.' . pathinfo($filename, PATHINFO_EXTENSION);;
+    	return (substr($cleanedPath, -1) === '_' ? substr($cleanedPath, 0, -1) : $cleanedPath) . '.' . pathinfo($filename, PATHINFO_EXTENSION);;
     }
 }
